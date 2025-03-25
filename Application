@@ -25,22 +25,48 @@ public class Main{
 	
 }
 
-class Task{
-	
-	static int idCounter = 0;
-	int id;
-	String description;
-	String status;
-	LocalDateTime createdAt;
-	LocalDateTime updatedAt;
-	
-	Task(){
-		this.id = idCounter;
-		this.status = "To Do";
-		this.createdAt = LocalDateTime.now();
-		this.updatedAt = LocalDateTime.now();
-		
-		idCounter++;
-	}
-}
+public class Task{
 
+    static int idCounter = 0;
+    int id;
+    private String description;
+    String status;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:MM:ss");
+
+    Task(){
+
+        this.id = idCounter;
+        this.status = "To Do";
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+
+        idCounter++;
+    }
+
+    public void add(String task){
+        this.description = task;
+    }
+
+    public String getTask(){
+        return description;
+    }
+
+    public void update(String status){
+        this.status = status;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void delete(){
+        this.description = null;
+        this.status = null;
+        idCounter--;
+    }
+
+    public String taskToString(){
+        return "ID: " + id + ", Description: " + description + ", Status: " + status + ", Time Created: " + createdAt.format(dateFormatter) + ", Updated at: " + updatedAt.format(dateFormatter) + "\n";
+    }
+
+}
