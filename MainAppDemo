@@ -1,4 +1,4 @@
-package tasklist;
+package org.example;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -29,80 +29,83 @@ import java.util.ArrayList;
 
 public class TaskTracker{
 
-	ArrayList<Task> tasklist;
-	
-	
-	TaskTracker(){
-		tasklist = new ArrayList<>();
-	}
-	
-	public void displayCompletedTask() {
-		for (Task task: tasklist) {
-			if (task.status.equalsIgnoreCase("completed")) {
-				System.out.println(task.taskToString());
-			}
-		}
-	}
-	
-	public void displayToDoTask() {
-		for (Task task: tasklist) {
-			if (task.status.equalsIgnoreCase("to do")) {
-				System.out.println(task.taskToString());
-			}
-		}
-	}
-	
-	public void displayInProgressTask() {
-		for (Task task: tasklist) {
-			if (task.status.equalsIgnoreCase("in progress")) {
-				System.out.println(task.taskToString());
-			}
-		}
-	}
-	
-	public static void main(String[] args) throws IOException {
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:MM:ss");
-		TaskTracker tasktracker = new TaskTracker();
-		
-		Task task = new Task("Grocery");
-		
-		
-		
-		task.update("completed");
-		
-		
-		try {
-			
-			BufferedReader bReader = new BufferedReader(new FileReader("task.txt"));
-			BufferedWriter bWriter = new BufferedWriter(new FileWriter("newtask.txt"));
-			String line;
-			
-			while ((line = bReader.readLine()) != null) {
-				
-				if (line.startsWith("ID: " + task.id)) {
-					bWriter.write(line.replaceAll("Status: .*", "Status: completed"));
-				}
-			}
-			
-			bReader.close();
-			bWriter.close();
-			
-			File file = new File("task.txt");
-			File file2 = new File("newtask.txt");
-			
-			if (file.delete()) {
-				file.renameTo(file2);
-			}
-			
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		
-		
-	}
-	
-	
+    ArrayList<Task> tasklist;
+
+
+    TaskTracker(){
+        tasklist = new ArrayList<>();
+    }
+
+    public void displayCompletedTask() {
+        for (Task task: tasklist) {
+            if (task.status.equalsIgnoreCase("completed")) {
+                System.out.println(task.taskToString());
+            }
+        }
+    }
+
+    public void displayToDoTask() {
+        for (Task task: tasklist) {
+            if (task.status.equalsIgnoreCase("to do")) {
+                System.out.println(task.taskToString());
+            }
+        }
+    }
+
+    public void displayInProgressTask() {
+        for (Task task: tasklist) {
+            if (task.status.equalsIgnoreCase("in progress")) {
+                System.out.println(task.taskToString());
+            }
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:MM:ss");
+        TaskTracker tasktracker = new TaskTracker();
+
+        Task task = new Task("Grocery");
+
+        /*FileWriter fwriter = new FileWriter("task.txt");
+        fwriter.write(task.taskToString());
+        fwriter.close();
+        */
+        task.update("completed");
+
+
+        try {
+
+            BufferedReader bReader = new BufferedReader(new FileReader("newtask.txt"));
+            BufferedWriter bWriter = new BufferedWriter(new FileWriter("task.txt"));
+            String line;
+
+            while ((line = bReader.readLine()) != null) {
+
+                if (line.startsWith("ID: " + task.id)) {
+                    bWriter.write(line.replace("Completed", "To Do"));
+
+                }
+            }
+
+            bReader.close();
+            bWriter.close();
+
+            File file = new File("newtask.txt");
+            File file2 = new File("task.txt");
+
+            if (file.delete()) {
+                file.renameTo(file2);
+            }
+
+
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+
+    }
+
+
 }
 
 class Task{
