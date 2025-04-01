@@ -28,12 +28,16 @@ import java.util.ArrayList;
 
 
 public class TaskTracker{
-
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     ArrayList<Task> tasklist;
 
 
     TaskTracker(){
         tasklist = new ArrayList<>();
+    }
+
+    public void addTask(Task task){
+        tasklist.add(task);
     }
 
     public void displayCompletedTask() {
@@ -58,6 +62,34 @@ public class TaskTracker{
                 System.out.println(task.taskToString());
             }
         }
+    }
+
+    public String updatedTask(String time, String status){
+        String[] timeSplit = time.split("Updated at: ");
+
+        String updatedTask = timeSplit[0] + LocalDateTime.now().format(dateFormatter);
+
+        if (updatedTask.contains("To Do")){
+            if (status.equalsIgnoreCase("to do")){
+                System.out.println("Status is already: To Do.");
+            }
+            updatedTask = updatedTask.replace("To Do", status);
+        }
+        else if (updatedTask.contains("Completed")){
+            if (status.equalsIgnoreCase("completed")){
+                System.out.println("Status is already: Completed.");
+            }
+            updatedTask = updatedTask.replace("Completed", status);
+        }
+        else if (updatedTask.contains("In Progress")){
+            if (status.equalsIgnoreCase("in progress")){
+                System.out.println("Status is already: In Progress.");
+            }
+            updatedTask = updatedTask.replace("In Progress", status);
+        }
+
+
+        return updatedTask;
     }
 
     public static void main(String[] args) throws IOException {
