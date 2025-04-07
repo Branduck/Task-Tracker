@@ -92,6 +92,22 @@ public class TaskTracker{
         return updatedTask;
     }
 
+    public Task StringToTask(String string){
+        String[] splitString = string.split(", ");
+        String[] newString = new String[5];
+
+        for (int i = 0; i < splitString.length; i++){
+            int index = splitString[i].lastIndexOf(";") + 2;
+            newString[i] = splitString[i].substring(index);
+        }
+
+        LocalDateTime createdAt = LocalDateTime.parse(newString[3],dateFormatter);
+        LocalDateTime updatedAt = LocalDateTime.parse(newString[4],dateFormatter);
+
+        return new Task(Integer.parseInt(newString[0]), newString[1], newString[2], createdAt, updatedAt);
+    }
+
+
     public static void main(String[] args) throws IOException {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:MM:ss");
         TaskTracker tasktracker = new TaskTracker();
