@@ -43,4 +43,54 @@ public class Task{
         return "ID: " + id + ", Description: " + description + ", Status: " + status + ", Time Created: " + createdAt.format(dateFormatter) + ", Updated at: " + updatedAt.format(dateFormatter) + "\n";
     }
 
+    //Updates status and set updated time to the time at which this task is updated.
+    //Returns new string
+    public String updatedTask(String task, String status) {
+        String[] timeSplit = task.split("Updated at: ");
+
+        String updatedTask = timeSplit[0] + "Updated at: " + LocalDateTime.now().format(dateFormatter);
+
+        if (!status.equalsIgnoreCase("To Do") && !status.equalsIgnoreCase("Completed") && !status.equalsIgnoreCase("in progress")) {
+            System.out.println("Invalid status");
+            return null;
+        }
+        if (updatedTask.contains("TO DO")) {
+            if (status.equalsIgnoreCase("to do")) {
+                System.out.println("Status is already: To Do.");
+            }
+            updatedTask = updatedTask.replace("To Do", status.toUpperCase());
+        } else if (updatedTask.contains("COMPLETED")) {
+            if (status.equalsIgnoreCase("completed")) {
+                System.out.println("Status is already: Completed.");
+            }
+            updatedTask = updatedTask.replace("Completed", status.toUpperCase());
+        } else if (updatedTask.contains("IN PROGRESS")) {
+            if (status.equalsIgnoreCase("in progress")) {
+                System.out.println("Status is already: In Progress.");
+            }
+            updatedTask = updatedTask.replace("In Progress", status.toUpperCase());
+        }
+
+        return updatedTask;
+    }
+
+
+    public static Task StringToTask(String string){
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
+        String[] splitString = string.split(", ");
+        String[] newString = new String[5];
+
+        for (int i = 0; i < splitString.length; i++){
+            int index = splitString[i].lastIndexOf(";") + 2;
+            newString[i] = splitString[i].substring(index);
+        }
+
+        LocalDateTime newCreatedAt = LocalDateTime.parse(newString[3],dateFormatter);
+        LocalDateTime newUpdatedAt = LocalDateTime.parse(newString[4],dateFormatter);
+
+
+
+        return new Task(Integer.parseInt(newString[0]), newString[1], newString[2], newCreatedAt, newUpdatedAt);
+    }
+
 }
