@@ -1,0 +1,92 @@
+package org.example;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import static org.example.Task.dateFormatter;
+
+public class Main {
+
+    boolean start = true;
+
+    Main() throws IOException {
+        TaskTracker taskTracker = new TaskTracker();
+        Scanner scanner = new Scanner(System.in);
+
+        while (start){
+            System.out.println("1. Show All Tasks");
+            System.out.println("2. Show To Do Tasks");
+            System.out.println("3. Show In Progress Tasks");
+            System.out.println("4. Show Completed Tasks");
+            System.out.println("5. Add Task");
+            System.out.println("6. Update Task");
+            System.out.println("7. Delete Task\n");
+
+            System.out.print("Select: ");
+            int menu_selection = scanner.nextInt();
+
+
+            switch (menu_selection){
+
+
+                case 1 -> taskTracker.displayAllTasks();
+                case 2 -> taskTracker.displayToDoTasks();
+                case 3 -> taskTracker.displayInProgressTasks();
+                case 4 -> taskTracker.displayCompletedTasks();
+                case 5 -> {
+                    System.out.print("Task: ");
+                    String task_to_add = scanner.next();
+
+                    taskTracker.addTask(new Task(task_to_add, "task.txt"));
+                }
+                case 6 -> {
+                    System.out.print("Task to update: ");
+                    int task = scanner.nextInt();
+
+                    System.out.println("Enter following integers to update accordingly: ");
+
+                    System.out.print("1. Completed\n2. In Progress\n3. To Do\nSelect: ");
+                    int status_update = scanner.nextInt();
+
+                    switch (status_update){
+                        case 1 -> taskTracker.getTask(taskTracker.tasklist, task).update("completed");
+                        case 2 -> taskTracker.getTask(taskTracker.tasklist, task).update("in progress");
+                        case 3 -> taskTracker.getTask(taskTracker.tasklist, task).update("to do");
+                    }
+                }
+                case 7 -> {
+                    System.out.print("Task to delete: ");
+                    int task = scanner.nextInt();
+
+                    taskTracker.getTask(taskTracker.tasklist, task).delete();
+                }
+                default -> {
+                    System.out.println("Invalid choice. \nPlease select option 1 to 7.");
+                    continue;
+                }
+            }
+
+            System.out.print("Continue: ");
+            String continue_choice = scanner.next();
+
+            if (continue_choice.equalsIgnoreCase("no")){
+                start = false;
+            }
+
+
+        }
+
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        new Main();
+
+
+    }
+}
