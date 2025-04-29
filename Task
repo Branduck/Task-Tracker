@@ -1,79 +1,62 @@
+package org.example;
+
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+/*
+Add, Update, and Delete tasks
+Mark a task as in progress or done
+List all tasks
+List all tasks that are done
+List all tasks that are not done
+List all tasks that are in progress
+-----------------------------------------------------------------------------------------------------------------------------
+Task properties:
+id: A unique identifier for the task
+description: A short description of the task
+status: The status of the task (todo, in-progress, done)
+createdAt: The date and time when the task was created
+updatedAt: The date and time when the task was last updated
+*/
+
 
 public class Task{
-
     static int idCounter = 0;
     int id;
     private String description;
     String status;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    boolean isDeleted = false;
 
-    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:MM:ss");
+    static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    Task(){
 
-        this.id = idCounter;
-        this.status = "To Do";
+
+    //Use this if planning save it in a file
+    Task(String grocery, String filename) throws IOException {
+
+        this.id = recentID(filename);
+        this.status = "TO DO";
+        this.description = grocery;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
 
-        idCounter++;
+
     }
 
-    public void add(String task){
-        this.description = task;
-    }
+    Task(int id, String description, String status,LocalDateTime createdAt, LocalDateTime updatedAt){
 
-    public String getTask(){
-        return description;
-    }
-
-    public void update(String status){
+        this.id = id;
         this.status = status;
-        this.updatedAt = LocalDateTime.now();
+        this.description = description;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+
     }
-
-    public void delete(){
-        this.description = null;
-        this.status = null;
-        idCounter--;
-    }
-
-    public String taskToString(){
-        return "ID: " + id + ", Description: " + description + ", Status: " + status + ", Time Created: " + createdAt.format(dateFormatter) + ", Updated at: " + updatedAt.format(dateFormatter) + "\n";
-    }
-
-    //Updates status and set updated time to the time at which this task is updated.
-    //Returns new string
-    public String updatedTask(String task, String status) {
-        String[] timeSplit = task.split("Updated at: ");
-
-        String updatedTask = timeSplit[0] + "Updated at: " + LocalDateTime.now().format(dateFormatter);
-
-        if (!status.equalsIgnoreCase("To Do") && !status.equalsIgnoreCase("Completed") && !status.equalsIgnoreCase("in progress")) {
-            System.out.println("Invalid status");
-            return null;
-        }
-        if (updatedTask.contains("TO DO")) {
-            if (status.equalsIgnoreCase("to do")) {
-                System.out.println("Status is already: To Do.");
-            }
-            updatedTask = updatedTask.replace("To Do", status.toUpperCase());
-        } else if (updatedTask.contains("COMPLETED")) {
-            if (status.equalsIgnoreCase("completed")) {
-                System.out.println("Status is already: Completed.");
-            }
-            updatedTask = updatedTask.replace("Completed", status.toUpperCase());
-        } else if (updatedTask.contains("IN PROGRESS")) {
-            if (status.equalsIgnoreCase("in progress")) {
-                System.out.println("Status is already: In Progress.");
-            }
-            updatedTask = updatedTask.replace("In Progress", status.toUpperCase());
-        }
-
-        return updatedTask;
-    }
-
 
     public static Task StringToTask(String string){
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
@@ -91,6 +74,129 @@ public class Task{
 
 
         return new Task(Integer.parseInt(newString[0]), newString[1], newString[2], newCreatedAt, newUpdatedAt);
+
     }
+
+    private int recentID(String filename) throws IOException {
+
+        ArrayList<String> list = new ArrayList<>();
+        ArrayList<Task> taskList = new ArrayList<>();
+        populateList(list, new File(filename));
+        int recent_id = 0;
+
+
+        if (!list.isEmpty()){
+            for (String s: list){
+                taskList.add(Task.StringToTask(s));
+            }
+
+            for (Task t: taskList){
+                if (t.id > recent_id){
+                    recent_id = t.id++;
+                }
+            }
+        }
+
+
+
+        return recent_id;
+
+    }
+
+    public void writeToFile(File file, List<String> list) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+
+        for (String s: list){
+            bufferedWriter.write(s);
+            bufferedWriter.newLine();
+        }
+
+        bufferedWriter.close();
+
+    }
+
+    public void delete() throws IOException {
+
+        this.isDeleted = true;
+        System.out.println("Task ID: " + this.id + " has been removed successfully.");
+
+        ArrayList<String> list = new ArrayList<>();
+        ArrayList<String> updatedList = new ArrayList<>();
+        populateList(list, new File("task.txt"));
+
+        for (String s: list){
+            if (!s.contains("ID; " + this.id)){
+                updatedList.add(s);
+            }
+        }
+
+        writeToFile(new File("task.txt"), updatedList);
+
+
+    }
+
+    public String taskToString(){
+        return "ID; " + id + ", Description; " + description + ", Status; " + status + ", Time Created; " + createdAt.format(dateFormatter) + ", Updated at; " + updatedAt.format(dateFormatter);
+    }
+
+    public void populateList(ArrayList<String> list, File file) throws IOException {
+        String line;
+
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+
+        while ((line = bufferedReader.readLine()) != null){
+            list.add(line);
+        }
+
+        bufferedReader.close();
+
+
+    }
+
+    //Updates status and set updated time to the time at which this task is updated.
+    //Returns new string
+    public void update(String status) throws IOException {
+
+        ArrayList<String> updateList = new ArrayList<>();
+        populateList(updateList, new File("task.txt"));
+
+
+        if (!status.equalsIgnoreCase("completed") && !status.equalsIgnoreCase("to do") && !status.equalsIgnoreCase("in progress")){
+            System.out.println("Invalid status!");
+            return;
+        }
+
+        String task1 = this.taskToString();
+
+        String[] updatetask = new String[1];
+        String[] timeSplit = task1.split("Updated at; ");
+        String[] idSplit = task1.split(", ");
+        String[] itemToRemove = new String[1];
+
+
+        String updatedTask = timeSplit[0] + "Updated at; " + LocalDateTime.now().format(dateFormatter);
+
+        if (updatedTask.contains("TO DO")) {
+            updatedTask = updatedTask.replace("TO DO", status.toUpperCase());
+
+        } else if (updatedTask.contains("COMPLETED")) {
+
+            updatedTask = updatedTask.replace("COMPLETED", status.toUpperCase());
+
+        } else if (updatedTask.contains("IN PROGRESS")) {
+
+            updatedTask = updatedTask.replace("IN PROGRESS", status.toUpperCase());
+        }
+
+        updateList.removeIf(line1 -> line1.contains(idSplit[0]));
+        updateList.add(updatedTask);
+
+        writeToFile(new File("task.txt"), updateList);
+
+        System.out.println("Updated successfully.");
+    }
+
+
+
 
 }
