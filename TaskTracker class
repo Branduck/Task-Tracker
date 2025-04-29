@@ -1,0 +1,160 @@
+package org.example;
+
+import java.io.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+
+//Add, Update, and Delete tasks
+//Mark a task as in progress or done
+//List all tasks
+//List all tasks that are done
+//List all tasks that are not done
+//List all tasks that are in progress
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+//Task properties:
+//id: A unique identifier for the task
+//description: A short description of the task
+//status: The status of the task (todo, in-progress, done)
+//createdAt: The date and time when the task was created
+//updatedAt: The date and time when the task was last updated
+
+
+public class TaskTracker{
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    ArrayList<Task> tasklist;
+
+
+    TaskTracker() throws IOException {
+        tasklist = new ArrayList<>();
+        loadTasks(tasklist);
+
+
+    }
+
+    public Task getTask(ArrayList<Task> taskList, int id) {
+        ArrayList<String> newList = new ArrayList<>();
+
+        for (Task t: taskList){
+            newList.add(t.taskToString());
+        }
+
+        for (String s: newList){
+            if (s.contains("ID; " + id)){
+                return Task.StringToTask(s);
+            }
+        }
+
+        System.out.println("Task not found.");
+        return null;
+    }
+
+    public void addTask(Task task) throws IOException {
+        tasklist.add(task);
+
+        BufferedWriter bWriter = new BufferedWriter(new FileWriter("task.txt", true));
+        bWriter.write(task.taskToString());
+        bWriter.newLine();
+        bWriter.close();
+    }
+
+    public void loadTasks(ArrayList<Task> tasklist) throws IOException {
+        BufferedReader bReader = new BufferedReader(new FileReader("task.txt"));
+        String line;
+
+        if (tasklist.isEmpty()){
+            System.out.println("Empty list.");
+        }
+        else{
+            while ((line = bReader.readLine()) != null){
+                tasklist.add(Task.StringToTask(line));
+            }
+        }
+
+        bReader.close();
+
+
+    }
+
+    public void displayAllTasks(){
+        for (Task task: tasklist){
+            String t = task.taskToString();
+            System.out.println(t);
+        }
+    }
+
+    public void displayCompletedTasks() {
+        for (Task task: tasklist) {
+            if (task.status.equalsIgnoreCase("completed") && !task.isDeleted) {
+                System.out.println(task.taskToString());
+            }
+        }
+    }
+
+    public  void displayToDoTasks() {
+        for (Task task: tasklist) {
+            if (task.status.equalsIgnoreCase("to do") && !task.isDeleted) {
+                System.out.println(task.taskToString());
+            }
+        }
+    }
+
+    public void displayInProgressTasks() {
+        for (Task task: tasklist) {
+            if (task.status.equalsIgnoreCase("in progress") && !task.isDeleted) {
+                System.out.println(task.taskToString());
+            }
+        }
+    }
+
+
+
+
+    public static void main(String[] args) throws IOException {
+
+
+
+
+            /*try {
+
+                BufferedReader bReader = new BufferedReader(new FileReader("newtask.txt"));
+                BufferedWriter bWriter = new BufferedWriter(new FileWriter("task.txt"));
+                String line;
+
+                while ((line = bReader.readLine()) != null) {
+
+                    if (line.startsWith("ID: 0")) {
+                        bWriter.write(line);
+                        bWriter.newLine();
+                    }
+                }
+                bWriter.close();
+                bReader.close();
+
+
+                File file = new File("newtask.txt");
+                File file2 = new File("task.txt");
+
+                if (file.delete()) {
+                    file.renameTo(file2);
+                }
+
+
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+            */
+
+
+
+        }
+
+
+    }
+
+
