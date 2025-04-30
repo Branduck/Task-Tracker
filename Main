@@ -1,4 +1,4 @@
-package org.example;
+package tasktracker;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static org.example.Task.dateFormatter;
+
 
 public class Main {
 
@@ -25,7 +25,8 @@ public class Main {
             System.out.println("4. Show Completed Tasks");
             System.out.println("5. Add Task");
             System.out.println("6. Update Task");
-            System.out.println("7. Delete Task\n");
+            System.out.println("7. Delete Task");
+            System.out.println("8. Exit\n");
 
             System.out.print("Select: ");
             int menu_selection = scanner.nextInt();
@@ -39,8 +40,9 @@ public class Main {
                 case 3 -> taskTracker.displayInProgressTasks();
                 case 4 -> taskTracker.displayCompletedTasks();
                 case 5 -> {
-                    System.out.print("Task: ");
-                    String task_to_add = scanner.next();
+                    System.out.println("Task: ");
+                    scanner.nextLine();
+                    String task_to_add = scanner.nextLine();
 
                     taskTracker.addTask(new Task(task_to_add, "task.txt"));
                 }
@@ -52,7 +54,7 @@ public class Main {
 
                     System.out.print("1. Completed\n2. In Progress\n3. To Do\nSelect: ");
                     int status_update = scanner.nextInt();
-
+                    
                     switch (status_update){
                         case 1 -> taskTracker.getTask(taskTracker.tasklist, task).update("completed");
                         case 2 -> taskTracker.getTask(taskTracker.tasklist, task).update("in progress");
@@ -64,6 +66,9 @@ public class Main {
                     int task = scanner.nextInt();
 
                     taskTracker.getTask(taskTracker.tasklist, task).delete();
+                }
+                case 8 -> {
+                	return;
                 }
                 default -> {
                     System.out.println("Invalid choice. \nPlease select option 1 to 7.");
@@ -86,7 +91,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         new Main();
-
-
+    	
+    	
+    	
     }
 }
