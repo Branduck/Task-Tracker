@@ -1,4 +1,4 @@
-package org.example;
+package tasktracker;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -84,22 +84,28 @@ public class Task{
         populateList(list, new File(filename));
         int recent_id = 0;
 
-
-        if (!list.isEmpty()){
-            for (String s: list){
-                taskList.add(Task.StringToTask(s));
-            }
-
-            for (Task t: taskList){
-                if (t.id > recent_id){
-                    recent_id = t.id++;
-                }
-            }
+        
+        if (list.isEmpty()) {
+        	System.out.println("Empty list.");
+        	return recent_id;
         }
 
+        for (String s: list) {
+        	taskList.add(Task.StringToTask(s));
+        }
 
+        if (taskList.size() == 1) {
+        	return 1;
+        }
+        
+        
+        for (Task t: taskList) {
+        	if (t.id > recent_id) {
+        		recent_id = t.id;
+        	}
+        }
 
-        return recent_id;
+        return recent_id += 1;
 
     }
 
