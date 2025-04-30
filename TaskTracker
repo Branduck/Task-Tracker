@@ -1,4 +1,4 @@
-package org.example;
+package tasktracker;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -28,11 +28,11 @@ import java.util.Locale;
 public class TaskTracker{
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     ArrayList<Task> tasklist;
-
+    File file = new File("task.txt");
 
     TaskTracker() throws IOException {
         tasklist = new ArrayList<>();
-        loadTasks(tasklist);
+        loadTasks(tasklist, file);
 
 
     }
@@ -63,21 +63,26 @@ public class TaskTracker{
         bWriter.close();
     }
 
-    public void loadTasks(ArrayList<Task> tasklist) throws IOException {
-        BufferedReader bReader = new BufferedReader(new FileReader("task.txt"));
+    public void loadTasks(ArrayList<Task> tasklist, File file) throws IOException {
+    	
+    	
+    	if (!file.exists()) {
+    		file.createNewFile();
+    		System.out.println("File created.");
+    	}
+    	
+    	
+        BufferedReader bReader = new BufferedReader(new FileReader(file));
         String line;
 
-        if (tasklist.isEmpty()){
-            System.out.println("Empty list.");
-        }
-        else{
+        
             while ((line = bReader.readLine()) != null){
                 tasklist.add(Task.StringToTask(line));
             }
-        }
-
+        
         bReader.close();
 
+        
 
     }
 
@@ -156,5 +161,3 @@ public class TaskTracker{
 
 
     }
-
-
