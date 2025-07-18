@@ -1,5 +1,6 @@
 package tasktracker;
 
+import java.awt.AWTException;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,26 +30,23 @@ public class TaskTracker{
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     ArrayList<Task> tasklist;
     File file = new File("task.txt");
+    Reminder reminder;
 
-    TaskTracker() throws IOException {
+    TaskTracker() throws IOException, AWTException {
         tasklist = new ArrayList<>();
         loadTasks(tasklist, file);
+        reminder = new Reminder();
 
-
+        ifDeadlineReachedSendReminder();
     }
 
     public Task getTask(ArrayList<Task> taskList, int id) {
-        ArrayList<String> newList = new ArrayList<>();
-
-        for (Task t: taskList){
-            newList.add(t.taskToString());
-        }
-
-        for (String s: newList){
-            if (s.contains("ID; " + id)){
-                return Task.StringToTask(s);
-            }
-        }
+        
+    	for (Task t: taskList) {
+    		if (t.id == id) {
+    			return t;
+    		}
+    	}
 
         System.out.println("Task not found.");
         return null;
@@ -82,8 +80,20 @@ public class TaskTracker{
         
         bReader.close();
 
-        
+        System.out.println("File loaded.\n");
 
+    }
+    
+    public void ifDeadlineReachedSendReminder() throws AWTException {
+    	
+    	for (Task task: tasklist) {
+    		if (task.status.equals("TO DO") || task.status.equals("IN PROGRESS")) {
+    			if (Reminder.ifDateIsEqualOrAfter(task.deadline) == 0 || Reminder.ifDateIsEqualOrAfter(task.deadline) == 1) {
+            		Reminder.displayNotification("Task: " + task.description);
+            	}
+    		}
+
+    	}
     }
 
     public void displayAllTasks(){
@@ -122,7 +132,7 @@ public class TaskTracker{
 
     public static void main(String[] args) throws IOException {
 
-
+    		
 
 
             /*try {
