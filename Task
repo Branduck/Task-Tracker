@@ -1,6 +1,7 @@
 package tasktracker;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,62 +27,66 @@ updatedAt: The date and time when the task was last updated
 public class Task{
     static int idCounter = 0;
     int id;
-    private String description;
+    String description;
     String status;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     boolean isDeleted = false;
+    LocalDate deadline;
 
     static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
 
     //Use this if planning save it in a file
-    Task(String grocery, String filename) throws IOException {
+    Task(String grocery, LocalDate localDate) throws IOException {
 
-        this.id = recentID(filename);
+        this.id = recentID();
         this.status = "TO DO";
         this.description = grocery;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-
+        this.deadline = localDate;
 
     }
 
-    Task(int id, String description, String status,LocalDateTime createdAt, LocalDateTime updatedAt){
+    public Task(int id, String description, String status,LocalDateTime createdAt, LocalDateTime updatedAt, LocalDate deadline){
 
         this.id = id;
         this.status = status;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-
+        this.deadline = deadline;
     }
 
     public static Task StringToTask(String string){
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
         String[] splitString = string.split(", ");
-        String[] newString = new String[5];
+        String[] newString = new String[6];
 
         for (int i = 0; i < splitString.length; i++){
             int index = splitString[i].lastIndexOf(";") + 2;
             newString[i] = splitString[i].substring(index);
+//ID; 12, Description; post 31460 tomorrow, Status; COMPLETED, Time Created; 2025-06-23 15:12:16, Updated at; 2025-06-24 11:23:21
+
         }
 
         LocalDateTime newCreatedAt = LocalDateTime.parse(newString[3],dateFormatter);
         LocalDateTime newUpdatedAt = LocalDateTime.parse(newString[4],dateFormatter);
+        LocalDate date = LocalDate.parse(newString[5]);
 
 
 
-        return new Task(Integer.parseInt(newString[0]), newString[1], newString[2], newCreatedAt, newUpdatedAt);
+        return new Task(Integer.parseInt(newString[0]), newString[1], newString[2], newCreatedAt, newUpdatedAt, date);
 
     }
 
-    private int recentID(String filename) throws IOException {
+    private int recentID() throws IOException {
 
         ArrayList<String> list = new ArrayList<>();
         ArrayList<Task> taskList = new ArrayList<>();
-        populateList(list, new File(filename));
+        populateList(list, new File("task.txt"));
         int recent_id = 0;
 
         
@@ -109,8 +114,13 @@ public class Task{
 
     }
 
-    public void writeToFile(File file, List<String> list) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+    public void setDeadline(String date) {
+    	//Enter date in "YYYY-MM-DD" format
+    	this.deadline = LocalDate.parse(date);
+    }
+    
+    public void writeToFile(List<String> list) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("task.txt"));
 
         for (String s: list){
             bufferedWriter.write(s);
@@ -136,13 +146,13 @@ public class Task{
             }
         }
 
-        writeToFile(new File("task.txt"), updatedList);
+        writeToFile(updatedList);
 
 
     }
 
     public String taskToString(){
-        return "ID; " + id + ", Description; " + description + ", Status; " + status + ", Time Created; " + createdAt.format(dateFormatter) + ", Updated at; " + updatedAt.format(dateFormatter);
+        return "ID; " + id + ", Description; " + description + ", Status; " + status + ", Time Created; " + createdAt.format(dateFormatter) + ", Updated at; " + updatedAt.format(dateFormatter) + ", Deadline; " + deadline.toString();
     }
 
     public void populateList(ArrayList<String> list, File file) throws IOException {
@@ -156,6 +166,7 @@ public class Task{
 
         bufferedReader.close();
 
+        
 
     }
 
@@ -167,20 +178,16 @@ public class Task{
         populateList(updateList, new File("task.txt"));
 
 
-        if (!status.equalsIgnoreCase("completed") && !status.equalsIgnoreCase("to do") && !status.equalsIgnoreCase("in progress")){
-            System.out.println("Invalid status!");
-            return;
-        }
-
         String task1 = this.taskToString();
 
-        String[] updatetask = new String[1];
+
         String[] timeSplit = task1.split("Updated at; ");
         String[] idSplit = task1.split(", ");
-        String[] itemToRemove = new String[1];
+        String[] deadlineSplit = timeSplit[1].split(",");
+        
 
 
-        String updatedTask = timeSplit[0] + "Updated at; " + LocalDateTime.now().format(dateFormatter);
+        String updatedTask = timeSplit[0] + "Updated at; " + LocalDateTime.now().format(dateFormatter) + ", " + deadlineSplit[1];
 
         if (updatedTask.contains("TO DO")) {
             updatedTask = updatedTask.replace("TO DO", status.toUpperCase());
@@ -197,9 +204,9 @@ public class Task{
         updateList.removeIf(line1 -> line1.contains(idSplit[0]));
         updateList.add(updatedTask);
 
-        writeToFile(new File("task.txt"), updateList);
+        writeToFile(updateList);
 
-        System.out.println("Updated successfully.");
+        System.out.println("Task " + idSplit[0] + " has updated successfully.");
     }
 
 
