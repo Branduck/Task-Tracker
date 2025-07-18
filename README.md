@@ -1,16 +1,6 @@
-# Task-Tracker
-//Add, Update, and Delete tasks
-//Mark a task as in progress or done
-//List all tasks
-//List all tasks that are done
-//List all tasks that are not done
-//List all tasks that are in progress
+A Task Tracker/Manager.
 
-//-----------------------------------------------------------------------------------------------------------------------------
 
-//Task properties:
-//id: A unique identifier for the task
-//description: A short description of the task
-//status: The status of the task (todo, in-progress, done)
-//createdAt: The date and time when the task was created
-//updatedAt: The date and time when the task was last updated
+Able to check your tasks.
+Track on-going tasks, to-do tasks, completed tasks.
+Notification system that notifies you upon hitting the date set for respective tasks.
